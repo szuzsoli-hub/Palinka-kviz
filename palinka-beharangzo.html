@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔥 A Nagy Pálinka Teszt</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@700;900&family=Lora:ital@1&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;overflow:hidden;background:#000}
+  canvas{position:fixed;inset:0;width:100%;height:100%}
+  #stage{position:fixed;inset:0;pointer-events:none}
+
+  .line{opacity:0;position:absolute;width:100%;text-align:center;padding:0 20px;transition:opacity .4s ease}
+
+  /* Főcím – marad végig */
+  #l-title{
+    top:7%;
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(1.8rem,8vw,3.8rem);
+    color:#fff;
+    letter-spacing:6px;
+    text-shadow:0 0 40px #ff8800, 0 0 80px #ff4400, 0 3px 0 #000;
+  }
+  #l-title-sub{
+    top:17%;
+    font-family:'Cinzel',serif;
+    font-size:clamp(.75rem,2.8vw,1.1rem);
+    color:#c4804a;letter-spacing:5px;text-transform:uppercase;
+  }
+  #l-sep1{
+    top:23%;height:1px;
+    background:linear-gradient(90deg,transparent,#f5c84299,transparent);
+    width:0;left:50%;transform:translateX(-50%);
+    transition:width 1s ease;
+  }
+
+  /* Középső tartalom */
+  #l-ki{
+    top:34%;
+    font-family:'Cinzel',serif;
+    font-size:clamp(1rem,4.2vw,1.8rem);
+    color:#c4a06a;letter-spacing:4px;
+    text-shadow:0 0 20px #c4a06a66;
+  }
+  #l-mester{
+    top:46%;
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(3rem,14vw,6rem);
+    color:#fff;letter-spacing:4px;
+    text-shadow:0 0 60px #ff8800,0 0 120px #ff4400,0 4px 0 #000;
+    line-height:1;
+  }
+  #l-felismero{
+    top:66%;
+    font-family:'Cinzel',serif;
+    font-size:clamp(.85rem,3.5vw,1.4rem);
+    color:#f5c842;letter-spacing:6px;
+    text-shadow:0 0 20px #f5c84288;
+  }
+
+  /* Szombaton eldől */
+  #l-szombat{
+    top:34%;
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(2.2rem,10vw,4.5rem);
+    color:#f5c842;letter-spacing:8px;
+    text-shadow:0 0 40px #f5c842,0 3px 0 #000;
+  }
+  #l-eldol{
+    top:56%;
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(2.5rem,11vw,5rem);
+    color:#fff;letter-spacing:8px;
+    text-shadow:0 0 40px #ff8800,0 3px 0 #000;
+  }
+
+  /* Hamarosan */
+  #l-hamarosan{
+    top:34%;
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(3.5rem,17vw,7.5rem);
+    color:#fff;letter-spacing:10px;
+    text-shadow:0 0 80px #ff8800,0 0 160px #ff4400,0 5px 0 #000;
+  }
+  #l-tuz{
+    top:65%;
+    font-size:clamp(2rem,8vw,3.5rem);
+    line-height:1;
+    filter:drop-shadow(0 0 20px #ff6600);
+  }
+
+  /* Újra gomb */
+  #btn-restart{
+    position:fixed;bottom:7%;left:50%;transform:translateX(-50%);
+    opacity:0;pointer-events:none;
+    background:rgba(245,200,66,.12);
+    border:1.5px solid rgba(245,200,66,.4);
+    border-radius:40px;
+    padding:14px 36px;
+    color:#f5c842;
+    font-family:'Cinzel',serif;
+    font-size:clamp(.9rem,3.5vw,1.1rem);
+    letter-spacing:3px;
+    cursor:pointer;
+    transition:all .3s ease;
+  }
+  #btn-restart:hover{background:rgba(245,200,66,.25);border-color:#f5c842;color:#fff}
+
+  @keyframes crashIn{from{transform:translateY(-60px) scaleY(1.3);opacity:0}to{transform:translateY(0) scaleY(1);opacity:1}}
+  @keyframes fadeUp{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes slam{0%{transform:scale(2.2);opacity:0;filter:blur(12px)}70%{transform:scale(.96)}100%{transform:scale(1);opacity:1;filter:blur(0)}}
+  @keyframes pulse{0%,100%{text-shadow:0 0 60px #ff8800,0 0 120px #ff4400,0 4px 0 #000}50%{text-shadow:0 0 100px #ffaa00,0 0 200px #ff6600,0 4px 0 #000}}
+  @keyframes goldPulse{0%,100%{text-shadow:0 0 40px #f5c842,0 3px 0 #000}50%{text-shadow:0 0 80px #f5c842,0 0 120px #f5a800,0 3px 0 #000}}
+  @keyframes bigPulse{0%,100%{text-shadow:0 0 80px #ff8800,0 0 160px #ff4400,0 5px 0 #000}50%{text-shadow:0 0 130px #ffbb00,0 0 250px #ff6600,0 5px 0 #000}}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  @keyframes btnIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="stage">
+  <div class="line" id="l-title">A NAGY PÁLINKA TESZT</div>
+  <div class="line" id="l-title-sub">Családi &ldquo;vakon&rdquo; kóstolás</div>
+  <div id="l-sep1"></div>
+  <div class="line" id="l-ki">KI A LEGNAGYOBB</div>
+  <div class="line" id="l-mester">PÁLINKÁS<br>A CSALÁDBAN!?</div>
+  <div class="line" id="l-felismero"></div>
+  <div class="line" id="l-szombat">SZOMBATON</div>
+  <div class="line" id="l-eldol">ELDŐL!</div>
+  <div class="line" id="l-hamarosan">HAMAROSAN</div>
+  <div class="line" id="l-tuz">🔥🍶🔥</div>
+</div>
+<button id="btn-restart">↺ &nbsp;ÚJRA</button>
+
+<script>
+// ── FIRE ────────────────────────────────────────────────────
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [], raf;
+
+function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; }
+window.addEventListener('resize', resize); resize();
+
+let intense = false;
+
+class P {
+  constructor(){ this.reset(); }
+  reset(){
+    const sp = intense ? W*0.85 : W*0.45;
+    this.x = W/2 + (Math.random()-.5)*sp;
+    this.y = H + Math.random()*50;
+    this.vx = (Math.random()-.5)*1.4;
+    this.vy = -(1.8 + Math.random()*(intense?5.5:3));
+    this.life = 0;
+    this.maxLife = 70 + Math.random()*90;
+    this.r = (intense?3:1.5) + Math.random()*(intense?9:5);
+    this.ember = Math.random()<.25;
+  }
+  tick(){
+    this.x += this.vx + Math.sin(this.life*.09)*.9;
+    this.y += this.vy; this.vy*=.99; this.life++;
+    if(this.life>this.maxLife) this.reset();
+  }
+  draw(){
+    const t=this.life/this.maxLife;
+    const a=t<.2?t/.2:1-(t-.2)/.8;
+    if(a<=0)return;
+    if(this.ember){
+      ctx.globalAlpha=a;
+      ctx.fillStyle=t<.5?'#ffcc44':'#ff7700';
+      ctx.beginPath(); ctx.arc(this.x,this.y,this.r*.28,0,Math.PI*2); ctx.fill();
+    } else {
+      const hue=t<.3?5:t<.6?25:45;
+      const g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r*(1-t*.4));
+      g.addColorStop(0,`hsla(${hue},100%,80%,${a})`);
+      g.addColorStop(.5,`hsla(${hue},100%,55%,${a*.6})`);
+      g.addColorStop(1,`hsla(${hue},100%,40%,0)`);
+      ctx.globalAlpha=.9; ctx.fillStyle=g;
+      ctx.beginPath(); ctx.arc(this.x,this.y,this.r*(1-t*.3),0,Math.PI*2); ctx.fill();
+    }
+  }
+}
+
+function spawn(n){ for(let i=0;i<n;i++) particles.push(new P()); }
+
+function drawFire(){
+  raf=requestAnimationFrame(drawFire);
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='rgba(0,0,0,.18)'; ctx.fillRect(0,0,W,H);
+  particles.forEach(p=>{ p.tick(); p.draw(); });
+  ctx.globalAlpha=1;
+}
+
+// ── HELPERS ─────────────────────────────────────────────────
+const el = id => document.getElementById(id);
+const w = ms => new Promise(r=>setTimeout(r,ms));
+
+function show(id, anim, extraStyle){
+  const e=el(id);
+  e.style.opacity='1';
+  if(anim) e.style.animation=anim;
+  if(extraStyle) Object.assign(e.style, extraStyle);
+}
+function fadeOut(id, dur=500){
+  const e=el(id);
+  e.style.transition=`opacity ${dur}ms ease`;
+  e.style.opacity='0';
+  return w(dur).then(()=>{ e.style.transition=''; e.style.animation='none'; });
+}
+function fadeOutAll(dur=500){
+  ['l-ki','l-mester','l-felismero','l-szombat','l-eldol','l-hamarosan','l-tuz'].forEach(id=>fadeOut(id,dur));
+  return w(dur);
+}
+function reset(){
+  ['l-title','l-title-sub','l-ki','l-mester','l-felismero','l-szombat','l-eldol','l-hamarosan','l-tuz'].forEach(id=>{
+    const e=el(id); e.style.opacity='0'; e.style.animation='none'; e.style.transition='';
+  });
+  el('l-sep1').style.width='0';
+  el('btn-restart').style.opacity='0';
+  el('btn-restart').style.pointerEvents='none';
+  el('btn-restart').style.animation='none';
+}
+
+// ── SEQUENCE ─────────────────────────────────────────────────
+async function run(){
+  reset();
+  particles=[];
+  intense=false;
+  cancelAnimationFrame(raf);
+
+  spawn(50); drawFire();
+  await w(1096);
+  spawn(40);
+
+  // Főcím megjelenik és marad
+  await w(658);
+  show('l-title','crashIn .6s cubic-bezier(.2,1.4,.4,1) forwards');
+  await w(329);
+  show('l-title-sub','fadeIn .8s ease forwards');
+  await w(548);
+  el('l-sep1').style.width='260px';
+  await w(987);
+
+  // Ki az igazi mester?
+  intense=true; spawn(70);
+  show('l-ki','fadeUp .7s ease forwards');
+  await w(548);
+  show('l-mester','slam .7s cubic-bezier(.2,1.4,.3,1) forwards');
+  await w(658);
+  el('l-mester').style.animation='slam .7s cubic-bezier(.2,1.4,.3,1) forwards, pulse 2s ease .7s infinite';
+  show('l-felismero','fadeUp .7s ease .3s forwards');
+  await w(3070);
+
+  // Átmenet
+  await fadeOutAll(600);
+  await w(438);
+  intense=true; spawn(100);
+
+  // Szombaton eldől
+  show('l-szombat','crashIn .6s cubic-bezier(.2,1.4,.4,1) forwards');
+  await w(438);
+  el('l-szombat').style.animation='crashIn .6s cubic-bezier(.2,1.4,.4,1) forwards, goldPulse 2s ease .6s infinite';
+  show('l-eldol','fadeUp .8s ease .3s forwards');
+  await w(3290);
+
+  // Hamarosan
+  await fadeOutAll(700);
+  await w(548);
+  intense=true; spawn(130);
+
+  show('l-hamarosan','slam .8s cubic-bezier(.2,1.4,.3,1) forwards');
+  await w(767);
+  el('l-hamarosan').style.animation='slam .8s cubic-bezier(.2,1.4,.3,1) forwards, bigPulse 1.8s ease .8s infinite';
+  show('l-tuz','fadeIn 1s ease .4s forwards');
+  await w(2741);
+
+  // Újra gomb
+  const btn=el('btn-restart');
+  btn.style.animation='btnIn .6s ease forwards';
+  btn.style.opacity='1';
+  btn.style.pointerEvents='all';
+}
+
+el('btn-restart').addEventListener('click', ()=>{
+  cancelAnimationFrame(raf);
+  run();
+});
+
+run();
+</script>
+</body>
+</html>

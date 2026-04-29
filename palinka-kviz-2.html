@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>🔥 Pálinka Kvíz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:#1a0a00;font-family:'Lora',serif;min-height:100vh}
+    .app{min-height:100vh;background:radial-gradient(ellipse at 20% 20%,#4a1800 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,#3d1200 0%,transparent 50%),#1a0a00;color:#f5e6c8;display:flex;flex-direction:column;align-items:center;padding:24px 16px 48px}
+    .logo{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,8vw,3.2rem);font-weight:700;color:#f5c842;text-shadow:0 0 40px #f5c84255;letter-spacing:-1px;text-align:center;line-height:1.1}
+    .logo span{font-style:italic;color:#e8a020}
+    .subtitle{font-size:.85rem;color:#c4a06a;letter-spacing:3px;text-transform:uppercase;margin-top:6px;margin-bottom:32px}
+    .card{background:rgba(255,255,255,.04);border:1px solid rgba(245,200,66,.18);border-radius:20px;padding:24px 20px;width:100%;max-width:480px;backdrop-filter:blur(12px);margin-bottom:14px}
+    .section-title{font-family:'Playfair Display',serif;font-size:1rem;color:#f5c842;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    input[type=text]{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(245,200,66,.25);border-radius:10px;padding:12px 14px;color:#f5e6c8;font-family:'Lora',serif;font-size:.95rem;outline:none;transition:border-color .2s;margin-bottom:8px}
+    input[type=text]:focus{border-color:#f5c842}
+    input[type=text]::placeholder{color:#7a6040}
+    .player-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+    .player-row input{margin-bottom:0;flex:1}
+    .remove-btn{background:rgba(255,80,80,.15);border:1px solid rgba(255,80,80,.3);color:#ff8080;border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+    .remove-btn:hover{background:rgba(255,80,80,.3)}
+    .add-btn{background:rgba(245,200,66,.08);border:1px dashed rgba(245,200,66,.3);color:#c4a06a;border-radius:10px;padding:10px;width:100%;cursor:pointer;font-family:'Lora',serif;font-size:.9rem;transition:all .15s}
+    .add-btn:hover{background:rgba(245,200,66,.14);color:#f5c842}
+    .palinka-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+    .palinka-label{font-family:'Playfair Display',serif;font-size:1.1rem;color:#f5c842;width:52px;flex-shrink:0}
+    select{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(245,200,66,.25);border-radius:10px;padding:12px 14px;color:#f5e6c8;font-family:'Lora',serif;font-size:.95rem;outline:none;cursor:pointer;-webkit-appearance:none}
+    select option{background:#2a1000}
+    .btn-primary{background:linear-gradient(135deg,#f5c842,#e8800a);border:none;border-radius:12px;padding:14px 28px;color:#1a0a00;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;cursor:pointer;width:100%;max-width:480px;margin-top:8px;letter-spacing:.5px;transition:opacity .2s,transform .1s;box-shadow:0 4px 24px #f5c84233}
+    .btn-primary:hover{opacity:.92;transform:translateY(-1px)}
+    .btn-primary:active{transform:translateY(0)}
+    .btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none}
+    .btn-secondary{background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.3);border-radius:12px;padding:12px 24px;color:#f5c842;font-family:'Lora',serif;font-size:.95rem;cursor:pointer;width:100%;max-width:480px;margin-top:8px;transition:all .15s}
+    .btn-secondary:hover{background:rgba(245,200,66,.15)}
+    .round-dots{display:flex;gap:8px;justify-content:center;margin-bottom:18px;flex-wrap:wrap;max-width:480px}
+    .round-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;border:1.5px solid rgba(245,200,66,.2);color:#7a6040;background:rgba(255,255,255,.04)}
+    .round-dot.done{background:rgba(245,200,66,.12);border-color:rgba(245,200,66,.4);color:#c4a06a}
+    .round-dot.active{background:linear-gradient(135deg,#f5c842,#e8800a);border-color:transparent;color:#1a0a00;box-shadow:0 0 16px #f5c84244}
+    .round-header{text-align:center;margin-bottom:20px;width:100%;max-width:480px}
+    .round-title{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,6vw,2.2rem);color:#f5c842;margin-bottom:4px}
+    .round-sub{font-size:.8rem;color:#7a6040;letter-spacing:2px;text-transform:uppercase}
+    .players-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;width:100%;max-width:480px;margin-bottom:16px}
+    .player-card{background:rgba(255,255,255,.04);border:1.5px solid rgba(245,200,66,.15);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all .15s;text-align:center}
+    .player-card:hover{background:rgba(245,200,66,.08);border-color:rgba(245,200,66,.35)}
+    .player-card.has-guess{border-color:rgba(245,200,66,.3);background:rgba(245,200,66,.06)}
+    .p-name{font-family:'Playfair Display',serif;font-size:1rem;color:#f5e6c8;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .p-guess{font-size:.78rem;color:#c4a06a;display:flex;align-items:center;justify-content:center;gap:4px}
+    .p-guess.empty{color:#4a3020;font-style:italic}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:flex-end;justify-content:center;z-index:100;backdrop-filter:blur(4px);animation:fadeIn .15s ease}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .overlay-sheet{background:#1e0e02;border:1px solid rgba(245,200,66,.25);border-radius:24px 24px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;animation:slideUp .2s ease}
+    @keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .overlay-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:#f5c842;text-align:center;margin-bottom:4px}
+    .overlay-sub{font-size:.8rem;color:#7a6040;text-align:center;letter-spacing:2px;text-transform:uppercase;margin-bottom:18px}
+    .fruit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+    .fruit-btn{background:rgba(255,255,255,.05);border:1.5px solid rgba(245,200,66,.15);border-radius:12px;padding:12px 6px;color:#c4a06a;font-family:'Lora',serif;font-size:.88rem;cursor:pointer;text-align:center;transition:all .15s}
+    .fruit-btn:hover{background:rgba(245,200,66,.12);color:#f5c842;border-color:rgba(245,200,66,.4)}
+    .fruit-btn.selected{background:rgba(245,200,66,.18);border-color:#f5c842;color:#f5e6c8;box-shadow:0 0 16px #f5c84222}
+    .overlay-cancel{background:transparent;border:none;color:#7a6040;font-family:'Lora',serif;font-size:.9rem;cursor:pointer;width:100%;text-align:center;padding:10px;margin-top:4px;transition:color .15s}
+    .overlay-cancel:hover{color:#c4a06a}
+    .confirm-name{font-family:'Playfair Display',serif;font-size:2rem;color:#f5c842;text-align:center;margin:16px 0 8px}
+    .confirm-sub{font-size:.85rem;color:#7a6040;text-align:center;letter-spacing:2px;text-transform:uppercase;margin-bottom:24px}
+    .confirm-btns{display:flex;gap:10px}
+    .confirm-yes{flex:1;background:linear-gradient(135deg,#f5c842,#e8800a);border:none;border-radius:12px;padding:16px;color:#1a0a00;font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;cursor:pointer;transition:opacity .15s}
+    .confirm-yes:hover{opacity:.9}
+    .confirm-no{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(245,200,66,.2);border-radius:12px;padding:16px;color:#c4a06a;font-family:'Playfair Display',serif;font-size:1.2rem;cursor:pointer;transition:all .15s}
+    .confirm-no:hover{background:rgba(255,255,255,.1)}
+    .history-toggle{background:transparent;border:none;color:#c4a06a;font-family:'Lora',serif;font-size:.85rem;cursor:pointer;width:100%;max-width:480px;text-align:center;padding:10px;margin-bottom:4px;letter-spacing:1px;transition:color .15s}
+    .history-toggle:hover{color:#f5c842}
+    .history-grid{width:100%;max-width:480px;overflow-x:auto;margin-bottom:12px}
+    .history-table{width:100%;border-collapse:separate;border-spacing:4px}
+    .history-table th{font-size:.72rem;color:#7a6040;text-transform:uppercase;letter-spacing:1px;padding:4px 6px;text-align:center;font-family:'Lora',serif;font-weight:400}
+    .history-cell{background:rgba(255,255,255,.04);border:1px solid rgba(245,200,66,.12);border-radius:8px;padding:8px 4px;text-align:center;font-size:.75rem;color:#c4a06a;cursor:pointer;transition:all .15s;min-width:60px}
+    .history-cell:hover{background:rgba(245,200,66,.1);border-color:rgba(245,200,66,.35)}
+    .history-name{font-size:.8rem;color:#f5e6c8;padding:8px 4px;font-family:'Playfair Display',serif;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .podium{display:flex;flex-direction:column;gap:10px;width:100%;max-width:480px}
+    .result-row{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1px solid rgba(245,200,66,.1);border-radius:14px;padding:14px 18px}
+    .result-row.gold{border-color:rgba(245,200,66,.5);background:rgba(245,200,66,.08)}
+    .result-row.silver{border-color:rgba(200,200,200,.3)}
+    .result-row.bronze{border-color:rgba(180,110,60,.35)}
+    .rank-num{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;width:32px;text-align:center}
+    .result-name{font-size:1.05rem;color:#f5e6c8;flex:1}
+    .result-score{font-family:'Playfair Display',serif;font-size:1.3rem;color:#f5c842}
+    .result-score span{font-size:.75rem;color:#7a6040}
+    .reveal-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.9rem;color:#c4a06a}
+    .reveal-row:last-child{border-bottom:none}
+    .reveal-answer{color:#f5c842;font-weight:600}
+    .detail-chip{border-radius:8px;padding:5px 9px;font-size:.75rem;display:inline-block;margin:3px 3px 0 0}
+    .detail-chip.ok{background:rgba(100,200,100,.12);border:1px solid rgba(100,200,100,.3);color:#7ddc7d}
+    .detail-chip.fail{background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.2);color:#ff9090}
+    .divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,#f5c84255,transparent);margin:20px auto}
+    .flame{display:inline-block;animation:flicker 1.2s ease-in-out infinite alternate}
+    @keyframes flicker{0%{transform:rotate(-2deg) scale(1)}100%{transform:rotate(2deg) scale(1.05)}}
+    .confetti-emoji{font-size:2rem;animation:bounce .6s ease infinite alternate;display:block;text-align:center}
+    @keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-8px)}}
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+    const FRUITS = ["Alma","Birs","Cseresznye","Dió","Eper","Körte","Málna","Meggy","Őszibarack","Sárga barack","Szeder","Szilva","Szőlő","Törköly","Vegyes"];
+    const ALL_PL = ["1-es","2-es","3-as","4-es","5-ös","6-os","7-es","8-as","9-es","10-es","11-es","12-es","13-as","14-es","15-ös"];
+
+    function App() {
+      const [phase, setPhase] = useState("setup");
+      const [palinkaCount, setPalinkaCount] = useState(5);
+      const PL = ALL_PL.slice(0, palinkaCount);
+      const [players, setPlayers] = useState(["","",""]);
+      const [answers, setAnswers] = useState(Array(5).fill(""));
+      const [guesses, setGuesses] = useState({});
+      const [round, setRound] = useState(0);
+      const changeCount = (n) => { setPalinkaCount(n); setAnswers(prev => Array(n).fill("").map((_,i)=>prev[i]||"")); };
+      const [editing, setEditing] = useState(null);
+      const [confirming, setConfirming] = useState(null);
+      const [tempFruit, setTempFruit] = useState("");
+      const [showHistory, setShowHistory] = useState(false);
+
+      const vp = players.filter(p => p.trim());
+      const ready = vp.length >= 2 && answers.slice(0,palinkaCount).every(a => a !== "");
+      const getG = (pi, ri) => guesses[pi]?.[ri] || "";
+      const tipped = vp.filter((_,pi) => !!getG(pi,round)).length;
+
+      const startQuiz = () => {
+        const init = {}; vp.forEach((_,i) => { init[i] = {}; });
+        setGuesses(init); setRound(0); setEditing(null); setShowHistory(false); setPhase("quiz");
+      };
+
+      const openEdit = (pi,ri) => setConfirming({pi,ri});
+      const confirmYes = () => {
+        const {pi,ri} = confirming; setConfirming(null);
+        setEditing({pi,ri}); setTempFruit(getG(pi,ri));
+      };
+      const saveGuess = () => {
+        if (!tempFruit) return;
+        setGuesses(prev => ({...prev, [editing.pi]: {...(prev[editing.pi]||{}), [editing.ri]: tempFruit}}));
+        setEditing(null); setTempFruit("");
+      };
+
+      const scores = vp.map((name,pi) => ({name, pi, pts: answers.slice(0,palinkaCount).filter((a,ri) => getG(pi,ri)===a).length})).sort((a,b) => b.pts-a.pts);
+      const rankE = i => ["🥇","🥈","🥉"][i] || `${i+1}.`;
+      const rankC = i => ["gold","silver","bronze"][i] || "";
+
+      const share = () => {
+        const lines = ["🔥 Pálinka Kvíz – Eredmények","",
+          ...scores.map((s,i) => `${rankE(i)} ${s.name}: ${s.pts}/5`),
+          "","🍶 Helyes válaszok:",
+          ...answers.slice(0,palinkaCount).map((a,i) => `  ${PL[i]}: ${a}`),
+          "","📋 Mindenki tippjei:",
+          ...scores.map(s => `${s.name}: ${answers.slice(0,palinkaCount).map((a,i) => { const g=getG(s.pi,i); return `${g||"—"}${g===a?"✓":`✗(${a})`}`; }).join("  ")}`)
+        ].join("\n");
+        if (navigator.share) navigator.share({title:"Pálinka Kvíz",text:lines});
+        else navigator.clipboard.writeText(lines).then(() => alert("Vágólapra másolva! 📋"));
+      };
+
+      return (
+        <div className="app">
+          <div className="logo"><span className="flame">🔥</span> Pálinka<span> Kvíz</span></div>
+          <div className="subtitle">Vak kóstolóverseny</div>
+
+          {phase==="setup" && <>
+            <div className="card">
+              <div className="section-title">👥 Játékosok</div>
+              {players.map((p,i) => (
+                <div className="player-row" key={i}>
+                  <input type="text" placeholder={`${i+1}. játékos neve`} value={p} onChange={e=>{const a=[...players];a[i]=e.target.value;setPlayers(a)}} maxLength={16}/>
+                  {players.length>2 && <button className="remove-btn" onClick={()=>setPlayers(players.filter((_,idx)=>idx!==i))}>✕</button>}
+                </div>
+              ))}
+              {players.length<15 && <button className="add-btn" onClick={()=>setPlayers([...players,""])}>+ Játékos hozzáadása</button>}
+            </div>
+            <div className="card">
+              <div className="section-title">🍶 Hány pálinka lesz?</div>
+              <div style={{display:'flex',gap:'8px',flexWrap:'wrap',marginBottom:'4px'}}>
+                {Array.from({length:15},(_,i)=>i+1).map(n=>(
+                  <button key={n} onClick={()=>changeCount(n)} style={{background:palinkaCount===n?'rgba(245,200,66,.25)':'rgba(255,255,255,.05)',border:`1.5px solid ${palinkaCount===n?'#f5c842':'rgba(245,200,66,.2)'}`,borderRadius:'8px',padding:'8px 14px',color:palinkaCount===n?'#f5c842':'#7a6040',fontFamily:"'Lora',serif",fontSize:'.9rem',cursor:'pointer'}}>{n}</button>
+                ))}
+              </div>
+            </div>
+            <div className="card">
+              <div className="section-title">🍶 Helyes válaszok</div>
+              <div style={{fontSize:".8rem",color:"#7a6040",marginBottom:"14px"}}>Csak a kvízmester állítja be!</div>
+              {answers.slice(0,palinkaCount).map((a,i) => (
+                <div className="palinka-row" key={i}>
+                  <div className="palinka-label">{PL[i]}</div>
+                  <select value={a} onChange={e=>{const arr=[...answers];arr[i]=e.target.value;setAnswers(arr)}}>
+                    <option value="">— válassz —</option>
+                    {FRUITS.map(f=><option key={f} value={f}>{f}</option>)}
+                  </select>
+                </div>
+              ))}
+            </div>
+            <button className="btn-primary" disabled={!ready} onClick={startQuiz}>Játék indítása →</button>
+          </>}
+
+          {phase==="quiz" && <>
+            <div className="round-dots">
+              {Array.from({length:palinkaCount},(_,i)=>i).map(ri=>(
+                <div key={ri} className={`round-dot ${ri<round?"done":ri===round?"active":""}`} onClick={()=>ri<=round&&setRound(ri)}>{ri+1}</div>
+              ))}
+            </div>
+            <div className="round-header">
+              <div className="round-title">🍶 {PL[round]} pálinka</div>
+              <div className="round-sub">{tipped===vp.length?"✓ mindenki tippelt":`${tipped} / ${vp.length} tipp megvan`}</div>
+            </div>
+            <div className="players-grid">
+              {vp.map((name,pi) => {
+                const g = getG(pi,round);
+                return (
+                  <div key={pi} className={`player-card ${g?"has-guess":""}`} onClick={()=>openEdit(pi,round)}>
+                    <div className="p-name">{name}</div>
+                    <div className={`p-guess ${g?"":"empty"}`}>{g ? <>✓ Tippelt ✏️</> : "tippelj →"}</div>
+                  </div>
+                );
+              })}
+            </div>
+            {round>0 && <>
+              <button className="history-toggle" onClick={()=>setShowHistory(h=>!h)}>
+                {showHistory?"▲ Korábbi tippek elrejtése":"✏️ Korábbi tippek javítása"}
+              </button>
+              {showHistory && <div className="history-grid">
+                <table className="history-table">
+                  <thead><tr><th style={{textAlign:"left"}}>Játékos</th>{[0,1,2,3,4].slice(0,round).map(ri=><th key={ri}>{PL[ri]}</th>)}</tr></thead>
+                  <tbody>{vp.map((name,pi)=>(
+                    <tr key={pi}>
+                      <td><div className="history-name">{name}</div></td>
+                      {[0,1,2,3,4].slice(0,round).map(ri=>(
+                        <td key={ri}><div className="history-cell" onClick={()=>openEdit(pi,ri)}>{getG(pi,ri)?"✓ ✏️":"—"}</div></td>
+                      ))}
+                    </tr>
+                  ))}</tbody>
+                </table>
+              </div>}
+            </>}
+            {round<palinkaCount-1
+              ? <button className="btn-primary" onClick={()=>{setRound(r=>r+1);setShowHistory(false)}}>Következő pálinka →</button>
+              : <button className="btn-primary" onClick={()=>setPhase("results")}>Eredmények megtekintése 🏆</button>
+            }
+            {round>0 && <button className="btn-secondary" onClick={()=>{setRound(r=>r-1);setShowHistory(false)}}>← Előző pálinka</button>}
+          </>}
+
+          {phase==="results" && <>
+            <span className="confetti-emoji">🎉</span>
+            <div style={{fontFamily:"'Playfair Display',serif",fontSize:"1.6rem",color:"#f5c842",marginTop:"10px",marginBottom:"24px"}}>Eredmények</div>
+            <div className="podium">
+              {scores.map((s,i)=>(
+                <div key={s.name} className={`result-row ${rankC(i)}`}>
+                  <div className="rank-num">{rankE(i)}</div>
+                  <div className="result-name">{s.name}</div>
+                  <div className="result-score">{s.pts}<span> / {palinkaCount}</span></div>
+                </div>
+              ))}
+            </div>
+            <div className="divider"/>
+            <div className="card">
+              <div className="section-title">🔍 Helyes válaszok</div>
+              {answers.map((a,i)=>(
+                <div className="reveal-row" key={i}><span>{PL[i]} pálinka</span><span className="reveal-answer">{a}</span></div>
+              ))}
+            </div>
+            <div className="card">
+              <div className="section-title">📊 Részletes találatok</div>
+              {scores.map(s=>(
+                <div key={s.name} style={{marginBottom:"14px"}}>
+                  <div style={{fontSize:".85rem",color:"#c4a06a",marginBottom:"6px"}}>{s.name}</div>
+                  <div>{answers.map((a,i)=>{const g=getG(s.pi,i);const ok=g===a;return <span key={i} className={`detail-chip ${ok?"ok":"fail"}`}>{PL[i]}: {g||"—"} {ok?"✓":`✗(${a})`}</span>})}</div>
+                </div>
+              ))}
+            </div>
+            <button className="btn-primary" onClick={share} style={{marginTop:"16px"}}>📤 Eredmények megosztása</button>
+            <button className="btn-secondary" onClick={()=>{setPhase("setup");setGuesses({});setRound(0);setShowHistory(false)}}>↺ Új játék</button>
+          </>}
+
+          {confirming!==null && (
+            <div className="overlay" onClick={()=>setConfirming(null)}>
+              <div className="overlay-sheet" onClick={e=>e.stopPropagation()}>
+                <div className="overlay-sub">Te vagy?</div>
+                <div className="confirm-name">{vp[confirming.pi]}</div>
+                <div className="confirm-sub">{PL[confirming.ri]} pálinka</div>
+                <div className="confirm-btns">
+                  <button className="confirm-no" onClick={()=>setConfirming(null)}>Nem</button>
+                  <button className="confirm-yes" onClick={confirmYes}>Igen, én vagyok!</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {editing!==null && (
+            <div className="overlay" onClick={()=>setEditing(null)}>
+              <div className="overlay-sheet" onClick={e=>e.stopPropagation()}>
+                <div className="overlay-title">{vp[editing.pi]}</div>
+                <div className="overlay-sub">{PL[editing.ri]} pálinka – melyik gyümölcs?</div>
+                <div className="fruit-grid">
+                  {FRUITS.map(f=><button key={f} className={`fruit-btn ${tempFruit===f?"selected":""}`} onClick={()=>setTempFruit(f)}>{f}</button>)}
+                </div>
+                <button className="btn-primary" disabled={!tempFruit} onClick={saveGuess}>Mentés ✓</button>
+                <button className="overlay-cancel" onClick={()=>setEditing(null)}>Mégse</button>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App/>);
+  </script>
+</body>
+</html>
